@@ -1,0 +1,77 @@
+name: Build & Release
+
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Select Xcode
+        run: sudo xcode-select -s /Applications/Xcode_15.4.app
+
+      - name: Build universal binary
+        run: |
+          chmod +x build.sh
+          ./build.sh
+
+      - name: Verify binary
+        run: |
+          file build/ClaudeWatch.app/Contents/MacOS/ClaudeWatch
+          codesign -dv build/ClaudeWatch.app 2>&1
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ClaudeWatch.app
+          path: build/ClaudeWatch.app
+
+  release:
+    needs: build
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: macos-14
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Select Xcode
+        run: sudo xcode-select -s /Applications/Xcode_15.4.app
+
+      - name: Build universal binary
+        run: |
+          chmod +x build.sh
+          ./build.sh
+
+      - name: Create release zip
+        run: |
+          cd build
+          zip -r ../ClaudeWatch.zip ClaudeWatch.app
+          cd ..
+          echo "SHA256=$(shasum -a 256 ClaudeWatch.zip | awk '{print $1}')" >> $GITHUB_ENV
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: ClaudeWatch.zip
+          generate_release_notes: true
+          body: |
+            ## Install
+
+            1. Download `ClaudeWatch.zip` below
+            2. Unzip and drag `ClaudeWatch.app` to Applications
+            3. First launch: right-click → Open
+            4. Grant Accessibility permission when prompted
+
+            **SHA-256:** `${{ env.SHA256 }}`
+
+            Or install via Homebrew:
+            ```
+            brew install --cask claudewatch
+            ```

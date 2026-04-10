@@ -439,7 +439,8 @@ class SessionMonitor: ObservableObject {
         try? proc.run(); proc.waitUntilExit()
         let comm = (String(data: pipe.fileHandleForReading.readDataToEndOfFile(), encoding: .utf8) ?? "")
             .trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
-        return comm.contains("claude") || comm.contains("node")
+        let basename = (comm as NSString).lastPathComponent
+        return basename == "claude" || basename == "node"
     }
 
     private func runOsascript(_ script: String) {

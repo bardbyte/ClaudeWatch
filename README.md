@@ -4,7 +4,7 @@ A native macOS desktop app that monitors and dispatches across multiple Claude C
 
 Stop tab-cycling through terminals to check which Claude is done. ClaudeWatch tells you.
 
-![macOS 14+](https://img.shields.io/badge/macOS-14%2B-blue) ![Swift](https://img.shields.io/badge/Swift-5-orange) ![License](https://img.shields.io/badge/license-MIT-green) ![Zero Dependencies](https://img.shields.io/badge/dependencies-0-brightgreen)
+![macOS 14+](https://img.shields.io/badge/macOS-14%2B-blue) ![Swift](https://img.shields.io/badge/Swift-5-orange) ![License](https://img.shields.io/badge/license-MIT-green) ![Zero Dependencies](https://img.shields.io/badge/dependencies-0-brightgreen) [![Build](https://github.com/bardbyte/ClaudeWatch/actions/workflows/build.yml/badge.svg)](https://github.com/bardbyte/ClaudeWatch/actions/workflows/build.yml)
 
 ## What it does
 
@@ -24,6 +24,12 @@ ClaudeWatch replaces that polling loop with a single dashboard.
 
 ## Install
 
+### Homebrew (recommended)
+
+```bash
+brew install --cask claudewatch
+```
+
 ### Download
 
 1. Go to [Releases](../../releases) and download `ClaudeWatch.zip`
@@ -36,6 +42,13 @@ ClaudeWatch replaces that polling loop with a single dashboard.
 ```bash
 git clone https://github.com/bardbyte/ClaudeWatch.git
 cd ClaudeWatch
+make build
+make install   # copies to /Applications
+```
+
+Or manually:
+
+```bash
 chmod +x build.sh
 ./build.sh
 open build/ClaudeWatch.app
@@ -84,11 +97,35 @@ ClaudeWatch reads Claude Code's session data from the filesystem:
 - Wispr Flow key codes bounded to 0-127
 - No data leaves your machine
 
+See [SECURITY.md](SECURITY.md) for our vulnerability disclosure policy.
+
 ## Requirements
 
 - macOS 14 (Sonoma) or later
 - Claude Code CLI installed
 - Accessibility permission (for terminal focus and dispatch)
+
+## Development
+
+```bash
+make build      # Build universal binary
+make install    # Install to /Applications
+make clean      # Clean build artifacts
+make release    # Create release zip with SHA-256
+make sign       # Sign with Developer ID (requires IDENTITY=)
+make notarize   # Notarize with Apple (requires APPLE_ID= TEAM_ID=)
+```
+
+## Contributing
+
+Contributions are welcome! Please:
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/your-feature`)
+3. Commit your changes
+4. Push to the branch and open a Pull Request
+
+For bugs, please use the [bug report template](../../issues/new?template=bug_report.yml).
 
 ## Tool Support
 
